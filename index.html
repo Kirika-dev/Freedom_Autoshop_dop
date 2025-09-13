@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Freedom GLOBAL MENU</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            user-select: none;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            font-family: "Montserrat", sans-serif;
+            margin: 0;
+			letter-spacing: 0;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #555;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ddd;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css?family=Ubuntu:400,700&amp;subset=cyrillic" rel="stylesheet">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css">
+	<link rel="stylesheet" type="text/css" href="./fonts/PFDinDisplayPro/stylesheet.css" />
+	<link rel="stylesheet" type="text/css" href="./fonts/bebas-neue/stylesheet.css" />
+	<link href="https://fonts.googleapis.com/css?family=Montserrat:100,200,300,400,500,600,700" rel="stylesheet">
+	
+
+
+
+
+    <link rel="stylesheet" href="css/weapons.css">
+
+
+
+
+	
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
+    <link rel="stylesheet" href="css/color.css">
+    <link rel="stylesheet" href="css/autoshop.css">
+    <link rel="stylesheet" href="css/animation.css">
+
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+</head>
+<body style="background: none">	
+<div v-if="active" v-cloak class="autoshop">
+		<transition-group name="opacity">
+			<div v-show="modal" key="autoshopmodalbuy" class="autoshop_modal">
+				<div class="autoshop_modal_block">
+					<div class="autoshop_modal_block_header">Подтверждение</div>
+					<div class="autoshop_modal_block_line"></div>
+					<div class="autoshop_modal_block_text">Вы уверены что хотите купить {{allpr[indexM][0]}} за {{allpr[indexM][1] | formatThousands}} {{cur}}</div>
+					<div class="autoshop_modal_block_btns">
+						<div @click="buy()" class="autoshop_modal_block_btns_btn">Да</div>
+						<div @click="modalClose()" class="autoshop_modal_block_btns_btn">Нет</div>
+					</div>
+				</div>
+			</div>
+		</transition-group>
+		<header>{{header}}</header>
+		<div class="autoshop_left">
+			<div class="autoshop_left_marks">
+				<div v-if="selectFilter != -1" v-for="(item, index) in AllMarksAuto">
+					<div v-if="AllMarksAuto[index] == allShowMarksAuto[index2]" :class="{active: selectFilter == index}" @click="selectMark(index)" v-for="(item2, index2) in allShowMarksAuto" class="autoshop_left_marks_block">
+						<img :src="'./assets/images/auto_marks/' + item2 + '.png'">
+					</div>
+				</div>
+			</div>
+			<div @click="changeSort()" class="autoshop_left_models_filter">
+				Сортировка по цене
+				<svg v-if="!sortState" style="transform: rotate(180deg); margin-top: -0.2vw" width="15" height="9" viewBox="0 0 15 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.89288 8.02182L14.5969 1.91174C14.8605 1.62957 15 1.34526 15 1.10894C15 0.652066 14.5 0.369446 13.663 0.369446L1.33503 0.369445C0.499044 0.369445 3.24602e-06 0.651709 3.2261e-06 1.10752C3.21575e-06 1.34419 0.139638 1.62396 0.403972 1.90676L6.10785 8.01968C6.47527 8.4128 6.96969 8.63051 7.50067 8.63051C8.03128 8.6306 8.52558 8.41538 8.89288 8.02182Z" fill="white"/></svg><svg v-if="sortState" width="15" height="9" viewBox="0 0 15 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.89288 8.02182L14.5969 1.91174C14.8605 1.62957 15 1.34526 15 1.10894C15 0.652066 14.5 0.369446 13.663 0.369446L1.33503 0.369445C0.499044 0.369445 3.24602e-06 0.651709 3.2261e-06 1.10752C3.21575e-06 1.34419 0.139638 1.62396 0.403972 1.90676L6.10785 8.01968C6.47527 8.4128 6.96969 8.63051 7.50067 8.63051C8.03128 8.6306 8.52558 8.41538 8.89288 8.02182Z" fill="white"/></svg>
+			</div>
+			<div v-if="selectFilter != -1" class="autoshop_left_models">	
+				<div v-for="(item, index) in allpr" @click="selectCar(index)" :class="{active: indexM == index}" v-if="!item[0].toUpperCase().indexOf(AllMarksAuto[selectFilter].toUpperCase())" class="autoshop_left_models_block">
+					<p>{{item[0]}}</p>
+					<a>{{item[1] | formatThousands}} {{cur}}</a>
+				</div>
+			</div>
+		</div>
+		<div class="autoshop_right">
+			<div class="autoshop_right_header">
+				<div class="autoshop_right_nameauto">{{allpr[indexM][0]}}</div>
+				<div class="autoshop_right_numbers">
+					<b>{{indCars}}</b>
+					<a>/{{maxCars}}</a>
+				</div>
+			</div>
+			<div class="autoshop_right_description">
+				{{getModelDesc(allpr[indexM][0])}}
+			</div>
+			<div class="autoshop_right_colors">
+				<p>Покраска</p>
+				<div class="autoshop_right_colors_list">
+					<div @click="selectColor(0)" class="autoshop_right_colors_list_cyl white-cycle"><div v-if="indexC == 0" class="autoshop_right_colors_list_cyl_selected"><img src="./assets/images/autoroom/yes.svg"></div></div>
+					<div @click="selectColor(1)" class="autoshop_right_colors_list_cyl grey-cycle"><div v-if="indexC == 1" class="autoshop_right_colors_list_cyl_selected"><img src="./assets/images/autoroom/yes.svg"></div></div>
+					<div @click="selectColor(2)" class="autoshop_right_colors_list_cyl black-cycle"><div v-if="indexC == 2" class="autoshop_right_colors_list_cyl_selected"><img src="./assets/images/autoroom/yes.svg"></div></div>
+					<div @click="selectColor(3)" class="autoshop_right_colors_list_cyl red-cycle"><div v-if="indexC == 3" class="autoshop_right_colors_list_cyl_selected"><img src="./assets/images/autoroom/yes.svg"></div></div>
+					<div @click="selectColor(4)" class="autoshop_right_colors_list_cyl orange-cycle"><div v-if="indexC == 4" class="autoshop_right_colors_list_cyl_selected"><img src="./assets/images/autoroom/yes.svg"></div></div>
+					<div @click="selectColor(5)" class="autoshop_right_colors_list_cyl purple-cycle"><div v-if="indexC == 5" class="autoshop_right_colors_list_cyl_selected"><img src="./assets/images/autoroom/yes.svg"></div></div>
+					<div @click="selectColor(6)" class="autoshop_right_colors_list_cyl blue-cycle"><div v-if="indexC == 6" class="autoshop_right_colors_list_cyl_selected"><img src="./assets/images/autoroom/yes.svg"></div></div>
+				</div>
+			</div>
+			<div class="autoshop_right_details">
+				<a>Государственная стоимость</a>
+				<p>{{allpr[indexM][1] | formatThousands}} {{cur}}</p>
+			</div>
+			<div class="autoshop_right_details">
+				<a>Вместимость багажника</a>
+				<p>{{numpas}} кг</p>
+			</div>
+			<div class="autoshop_right_btns">
+				<div @click="testdrive()" class="autoshop_right_btns_btn">Тест-драйв</div>
+				<div @click="openBuyMenu()" class="autoshop_right_btns_btn buy">Купить</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
